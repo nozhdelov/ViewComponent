@@ -1,0 +1,44 @@
+<html>
+    
+    
+    
+    <head>
+        <script src="src/q.js" ></script>
+        <script src="src/ViewComponent.js" ></script>
+        <script src="src/KWInfoBox.js" ></script>
+        <script src="src/KWButton.js" ></script>
+        
+    </head>
+    
+    
+    
+    <body>
+        
+        <div id="div" >
+            
+
+            
+            <KWInfoBox text="zdrastiiiiii" />
+        </div>
+        
+        <script>
+          
+        var c = new ViewComponent.KWButton({
+            value : 'kur',
+            action : function(){
+                alert(this.value);
+            }
+        });
+        
+        c.appendTo(document.getElementById('div'));
+        
+       //ViewComponent.scan(document.getElementById('div'));
+       
+     </script>
+        
+        
+        
+    </body>
+    
+    
+</html>
