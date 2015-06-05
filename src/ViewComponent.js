@@ -14,6 +14,19 @@ ViewComponent.prototype.init = function(){
 };
 
 
+ViewComponent.prototype.render = function(){
+	return true;
+};
+
+ViewComponent.prototype.onBeforeRender = function(){
+	return true;
+};
+
+ViewComponent.prototype.onAfterRender = function(){
+	return true;
+};
+
+
 ViewComponent.prototype.getRenderable = function(){
 	var tree = this.render();
 	var deferred = Q.defer();
@@ -47,14 +60,17 @@ ViewComponent.prototype.prepare = function(tree){
 	});
 	
 	this.renderTree = tree;
+	this.onBeforeRender();
 	
 	return tree;
 };
 
 
 ViewComponent.prototype.appendTo = function(node){
+	var self = this;
 	this.getRenderable().then(function(res){
 		node.appendChild(res);
+		self.onAfterRender();
 	}).fail(function(res){
 		throw new Error(res);
 	});
