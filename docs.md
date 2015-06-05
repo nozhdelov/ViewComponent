@@ -52,7 +52,7 @@ The main principles ViewComponent is bult on are as follows :
 
 
 
-***HTML Syntax ***
+***HTML Syntax***
 
     <div>
     	<MyComponent someValue="5" ></MyComponent>
