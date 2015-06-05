@@ -39,7 +39,8 @@ The main principles ViewComponent is bult on are as follows :
 
 **Using component**
 
-	***JS Syntax***
+***JS Syntax***
+
 
     var component = new ViewComponent.MyComponent({
     	someValue : 5,
@@ -48,6 +49,7 @@ The main principles ViewComponent is bult on are as follows :
     	}
     });
     component.appendTo(someDomNode);
+
 
 
 ***HTML Syntax ***
