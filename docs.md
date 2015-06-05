@@ -5,7 +5,7 @@
 
 ViewComponent a.k.a KW.ViewComponent is what would've happened if React fucked Ember and then a freakish baby was born.... and then it was dropped on its head.
 
-The main principles ViewComponent is bult on are as follows : 
+The main principles ViewComponent is built on are as follows : 
 
  1. Creating reusable UI components that encapsulate structure design and behavior
  2. Using those components in a few different ways depending on the context
@@ -82,7 +82,7 @@ In this example the doSomeStuff method will be searched in the components action
 
 
 ----------
-**Some nasty stuff I  did not mention **
+**Some nasty stuff I  did not mention**
 
  1. Some of this things don't actually work (I've only been writing this shit for 1 day)
  2. When using the HTML syntax all attributes names are internally converted to lower case (no work-around at least for now ..... PS what would Lutsi say about the DOM)
