@@ -111,15 +111,24 @@ ViewComponent.register = function(name, object){
 ViewComponent.extend = function(object, parent){
 	var i;
 	var F = function(config, parent){
+		var i, actionName;
 		for(i in object){
 			if(object.hasOwnProperty(i)){
 				this[i] = object[i];
 			}
 		}
 		
+		
 		if(parent){
 			parent.addChild(this);
 			this.parent = parent;
+		}
+		
+		for(i in config){
+			if(config.hasOwnProperty(i) && i.indexOf('action-') >= 0){
+				actionName = i.replace('action-', '');
+				config[actionName] = this.findExecutable(actionName);
+			}
 		}
 		
 		this.init(config);

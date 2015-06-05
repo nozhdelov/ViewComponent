@@ -4,12 +4,14 @@
 **What is ViewComponent**
 
 ViewComponent a.k.a KW.ViewComponent is what would've happened if React fucked Ember and then a freakish baby was born.... and then it was dropped on its head.
+
 The main principles ViewComponent is bult on are as follows : 
 
  1. Creating reusable UI components that encapsulate structure design and behavior
  2. Using those components in a few different ways depending on the context
  3. Nesting those components to create more complex ones
  4. Heavy  drinking
+
 (this is for the first day of writing)
 
 **Declaring component**
@@ -34,7 +36,9 @@ The main principles ViewComponent is bult on are as follows :
  - **onAfterRender** (*optional*)  method - called after the content is inserted in the DOM
  
 
+
 **Using component**
+
 	***JS Syntax***
 
     var component = new ViewComponent.MyComponent({
@@ -49,7 +53,7 @@ The main principles ViewComponent is bult on are as follows :
 ***HTML Syntax ***
 
     <div>
-    	<MyComponent someValue="5", action="someAction" ></MyComponent>
+    	<MyComponent someValue="5" ></MyComponent>
     </div>
 
 
@@ -66,9 +70,10 @@ Components can be nested in one another forming a hierarchical structure similar
 
 
 **The Actions object**
-Every component can optionally implement an actions map that is used for finding functions when using *action-** attributes the HTML syntax
 
-    <myComponent click="action-doSomeStuff" change="action-doSomeOtherStuff" ></myComponent>
+Every component can optionally implement an actions map that is used for finding functions when using *action-** attributes with the HTML syntax
+
+    <myComponent action-click="doSomeStuff" action-change="doSomeOtherStuff" ></myComponent>
 In this example the doSomeStuff method will be searched in the components actions object. If not found there the search will propagate to its parents until the method is found or a component without parent is reached.
 
 

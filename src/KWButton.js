@@ -18,8 +18,8 @@ ViewComponent.KWButton = ViewComponent.register('KWButton', {
 			this.disable = !!config.disable;
 		}
 		
-		if(config.disableTimeout){
-			this.disableTimeout = +config.disableTimeout;
+		if(config.timeout){
+			this.timeout = +config.timeout;
 		}
 		
 		if(config.action){

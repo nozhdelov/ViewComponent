@@ -6,13 +6,14 @@ ViewComponent.KWInfoBox = ViewComponent.register('KWInfoBox', {
 	actions : {
 		close : function(){
 			alert('da sa ebe6');
-		}
+		},
 	},
 	
 	text : '',
 	
 	init : function(config){
 		this.text = config.text;
+		console.log(config);
 	},
 	
 	render : function(){
