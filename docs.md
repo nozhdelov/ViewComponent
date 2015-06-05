@@ -26,7 +26,7 @@ The main principles ViewComponent is bult on are as follows :
     });
 
  - **init** method (*optional*) - use it for whatever Initialization is needed .... the config map will be passed from the constructor on creation.
- - **render** method - should return some kind of visual representation of the component. Suported types are : 
+ - **render** method - should return some kind of visual representation of the component. Supported types are : 
 	 - HTML string
 	 - DOM Element
 	 - DOM Fragment
@@ -61,6 +61,7 @@ The main principles ViewComponent is bult on are as follows :
 
 
 **Components hierarchy and nesting**
+
 Components can be nested in one another forming a hierarchical structure similar to the DOM. Unlike the DOM however the components do not have any horizontal relations with each other but only keep child-parent like relations.
 
     <MyComponent>
