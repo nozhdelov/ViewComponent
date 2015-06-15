@@ -4,9 +4,13 @@ function ViewComponent(){
 	this.parent = null;
 	this.children = [];
 	this.renderTree = null;
+	this.parentNode = null;
+	this.nodeContent = '';
 	this.actions = {};
 	
 }
+
+ViewComponent.prototype = new EventEmitter();
 
 
 ViewComponent.prototype.init = function(){
@@ -53,14 +57,21 @@ ViewComponent.prototype.prepare = function(tree){
 	} else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
 	}
+	
+	if(tree.nodeType === 11){
+		this.renderTree = Array.prototype.slice.call(tree.childNodes, 0);
+	} else {
+		this.renderTree = tree;
+	}
+	
 
 	
 	ViewComponent.traverseTree(tree, function(node){
 		ViewComponent.scanNode(node, self);
 	});
 	
-	this.renderTree = tree;
-	this.onBeforeRender();
+
+	this.emit('beforeRender');
 	
 	return tree;
 };
@@ -68,13 +79,39 @@ ViewComponent.prototype.prepare = function(tree){
 
 ViewComponent.prototype.appendTo = function(node){
 	var self = this;
+	if(!node instanceof HTMLElement) {
+		throw new Error('Invalid DOM element');
+	}
+	
+	this.parentNode = node;
 	this.getRenderable().then(function(res){
 		node.appendChild(res);
-		self.onAfterRender();
+		self.emit('render');
 	}).fail(function(res){
 		throw new Error(res);
 	});
 	
+	
+};
+
+
+ViewComponent.prototype.rerender = function(){
+	var insertionNode = this.renderTree[0];
+	var oldThree = this.renderTree.slice();
+	var self = this;
+
+	
+	this.getRenderable().then(function(tree){
+		self.parentNode.insertBefore(tree, insertionNode);
+		oldThree.forEach(function(node){
+		if(node.parentNode){
+			node.parentNode.removeChild(node);
+		}
+		
+		self.emit('render');
+	});
+		
+	});
 	
 };
 
@@ -106,9 +143,13 @@ ViewComponent.prototype.findExecutable = function(name){
 };
 
 
-ViewComponent.prototype.destroy = function(){
-	console.log(this.renderTree, this.renderTree.parentNode);
-	this.renderTree.parentNode.removeChild(this.renderTree);
+ViewComponent.prototype.removeFromDOM = function(){
+	this.renderTree.forEach(function(node){
+		if(node.parentNode){
+			node.parentNode.removeChild(node);
+		}
+	});
+	
 };
 
 
@@ -199,6 +240,8 @@ ViewComponent.scanNode = function(node, parent){
 	
 	component = new ViewComponent.registeredComponents[node.nodeName.toUpperCase()](config, parent);
 	
+	component.nodeContent = node.innerHTML;
+	component.parentNode = node.parentNode;
 	component.getRenderable().then(function(tree){
 		node.parentNode.insertBefore(tree, node);
 		node.parentNode.removeChild(node);

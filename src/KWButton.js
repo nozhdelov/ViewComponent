@@ -52,9 +52,16 @@ ViewComponent.KWButton = ViewComponent.register('KWButton', {
 		}, false);
 		
 		
-		
 		return btn;
 		
+	},
+	
+	onAfterRender : function(){
+		
+		document.getElementById('kur').addEventListener('click', function(){
+			alert('dsfdsfdsfd');
+		});
 	}
+	
 	
 });

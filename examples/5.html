@@ -3,11 +3,16 @@
     
     
     <head>
+        <script src="http://code.jquery.com/jquery-1.11.3.min.js" ></script>
         <script src="../src/q.js" ></script>
+         
         <script src="../src/EventEmitter.js" ></script>
         <script src="../src/ViewComponent.js" ></script>
         <script src="../src/KWInfoBox.js" ></script>
         <script src="../src/KWButton.js" ></script>
+        <script src="../src/AsyncContent.js" ></script>
+        <script src="../src/DeepNesting.js" ></script>
+        <script src="../src/InnerHtml.js" ></script>
         
     </head>
     
@@ -17,23 +22,18 @@
         
         <div id="div" >
             
-
+            <InnerHtml>
+                <h1>some text</h1>
+                <h1>some more text</h1>
+                
+                
+            </InnerHtml>
+            
             
         </div>
         
         <script>
-          
-        var c = new ViewComponent.KWButton({
-            value : 'kur',
-            action : function(){
-                alert(this.value);
-            }
-        });
-        
-        c.appendTo(document.getElementById('div'));
-        
-
-       
+      ViewComponent.scan(document.getElementById('div'));
      </script>
         
         
