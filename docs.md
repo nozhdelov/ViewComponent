@@ -20,9 +20,7 @@ The main principles ViewComponent is built on are as follows :
 
      var MyComponent = ViewComponent.register('MyComponent, {
     	init : function(config){},
-    	render : function(){},
-    	onBeforeRender : function(){},
-    	onAfterRender : function(){}
+    	render : function(){}
     });
 
  - **init** method (*optional*) - use it for whatever Initialization is needed .... the config map will be passed from the constructor on creation.
@@ -31,9 +29,10 @@ The main principles ViewComponent is built on are as follows :
 	 - DOM Element
 	 - DOM Fragment
 	 - Promise for whatever of the above (Yes this means you can load preprocessed HTML from the server )
-	 
- - **onBeforeRender** (*optional*)  method - called when the render content is ready and is about to be inserted in the DOM
- - **onAfterRender** (*optional*)  method - called after the content is inserted in the DOM
+
+**Events**	 
+ - **beforeRender**  - emitted when the render content is ready and is about to be inserted in the DOM
+ - **render**  - emitted after the content is inserted in the DOM
  
 
 
