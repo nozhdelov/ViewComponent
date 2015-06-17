@@ -48,12 +48,17 @@ ViewComponent.prototype.getRenderable = function(){
 
 
 ViewComponent.prototype.prepare = function(tree){
-	var template;
+	var div, i, fragment;
 	var self = this;
 	if(typeof tree === 'string'){
-		template = document.createElement('template');
-		template.innerHTML = tree;
-		tree = template.content;
+		div = document.createElement('div');
+		div.innerHTML = tree;
+		fragment = document.createDocumentFragment();
+		for(i = 0; i < div.childNodes.length; i++){
+			fragment.appendChild(div.childNodes[i]);
+		}
+		
+		tree = fragment;
 	} else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
 	}
