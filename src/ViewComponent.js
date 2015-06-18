@@ -189,7 +189,7 @@ ViewComponent.extend = function(object, parent){
 		for(i in config){
 			if(config.hasOwnProperty(i) && i.indexOf('action-') >= 0){
 				actionName = i.replace('action-', '');
-				config[actionName] = this.findExecutable(actionName);
+				config[actionName] = this.findExecutable(config[i]);
 			}
 		}
 		
@@ -250,6 +250,7 @@ ViewComponent.scanNode = function(node, parent){
 	component.getRenderable().then(function(tree){
 		node.parentNode.insertBefore(tree, node);
 		node.parentNode.removeChild(node);
+		component.emit('render');
 	});
 	
 	
