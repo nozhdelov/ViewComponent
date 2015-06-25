@@ -148,6 +148,16 @@ ViewComponent.prototype.findExecutable = function(name){
 };
 
 
+ViewComponent.prototype.destroy = function(){
+	this.emit('destroy');
+	this.children.forEach(function(child){
+		child.destroy();
+	});
+	
+	this.removeFromDom();
+};
+
+
 ViewComponent.prototype.removeFromDOM = function(){
 	this.renderTree.forEach(function(node){
 		if(node.parentNode){
