@@ -31,7 +31,7 @@ The main principles ViewComponent is built on are as follows :
 	 - Promise for whatever of the above (Yes this means you can load preprocessed HTML from the server )
 
 **Events**	 
- - **beforeRender**  - emitted when the render content is ready and is about to be inserted in the DOM
+ - **parsed**  - emitted when the render content is ready and is about to be inserted in the DOM. At this stage the component`s children are discovered.
  - **render**  - emitted after the content is inserted in the DOM
  
 

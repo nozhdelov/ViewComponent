@@ -76,7 +76,7 @@ ViewComponent.prototype.prepare = function(tree){
 	});
 	
 
-	this.emit('beforeRender');
+	this.emit('parsed');
 	
 	return tree;
 };
