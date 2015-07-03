@@ -1,6 +1,6 @@
 'use strict';
 
-ViewComponent = function(){
+function ViewComponent(){
 	this.parent = null;
 	this.children = [];
 	this.renderTree = null;
@@ -133,14 +133,16 @@ ViewComponent.prototype.findExecutable = function(name, params){
 	var parent;
 	if(this.actions[name]){
 		return function(){
-			this.actions[name].apply(this, params);
+			var args = Array.prototype.slice.call(arguments).concat(params);
+			this.actions[name].apply(this, args);
 		};
 	}
 	parent = this.getParent();
 	while(parent){
 		if(parent.actions[name]){
 			return function(){
-				parent.actions[name].apply(parent, params);
+				var args = Array.prototype.slice.call(arguments).concat(params);
+				parent.actions[name].apply(parent, args);
 			};
 		}
 		parent = parent.getParent();
