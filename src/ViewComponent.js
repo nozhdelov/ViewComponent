@@ -1,14 +1,15 @@
 'use strict';
 
-function ViewComponent(){
+ViewComponent = function(){
 	this.parent = null;
 	this.children = [];
 	this.renderTree = null;
 	this.parentNode = null;
 	this.nodeContent = '';
 	this.actions = {};
+	this.events = {};
 	
-}
+};
 
 ViewComponent.prototype = new EventEmitter();
 
@@ -19,19 +20,13 @@ ViewComponent.prototype.init = function(){
 
 
 ViewComponent.prototype.render = function(){
-	return true;
-};
-
-ViewComponent.prototype.onBeforeRender = function(){
-	return true;
-};
-
-ViewComponent.prototype.onAfterRender = function(){
-	return true;
+	return "";
 };
 
 
-ViewComponent.prototype.getRenderable = function(){
+
+
+ViewComponent.prototype.getRenderable = function(){ 
 	var tree = this.render();
 	var deferred = Q.defer();
 	var self = this;
@@ -54,7 +49,9 @@ ViewComponent.prototype.prepare = function(tree){
 		div = document.createElement('div');
 		div.innerHTML = tree;
 		fragment = document.createDocumentFragment();
+	
 		for(i = 0; i < div.childNodes.length; i++){
+			
 			fragment.appendChild(div.childNodes[i]);
 		}
 		
@@ -63,11 +60,12 @@ ViewComponent.prototype.prepare = function(tree){
 		throw new Error('Invalid DOM element');
 	}
 	
-	if(tree.nodeType === 11){
+	if(tree.nodeType === 11){		
 		this.renderTree = Array.prototype.slice.call(tree.childNodes, 0);
 	} else {
 		this.renderTree = tree;
 	}
+	
 	
 
 	
@@ -131,21 +129,26 @@ ViewComponent.prototype.getParent = function(){
 };
 
 
-ViewComponent.prototype.findExecutable = function(name){
+ViewComponent.prototype.findExecutable = function(name, params){
 	var parent;
 	if(this.actions[name]){
-		return this.actions[name].bind(this);
+		return function(){
+			this.actions[name].apply(this, params);
+		};
 	}
 	parent = this.getParent();
 	while(parent){
 		if(parent.actions[name]){
-			return parent.actions[name].bind(parent);
+			return function(){
+				parent.actions[name].apply(parent, params);
+			};
 		}
 		parent = parent.getParent();
 	}
 	
-	return false;
+	return undefined;
 };
+
 
 
 ViewComponent.prototype.destroy = function(){
@@ -154,11 +157,13 @@ ViewComponent.prototype.destroy = function(){
 		child.destroy();
 	});
 	
-	this.removeFromDom();
+	this.removeFromDOM();
 };
 
 
+
 ViewComponent.prototype.removeFromDOM = function(){
+	return;
 	this.renderTree.forEach(function(node){
 		if(node.parentNode){
 			node.parentNode.removeChild(node);
@@ -166,6 +171,24 @@ ViewComponent.prototype.removeFromDOM = function(){
 	});
 	
 };
+
+
+
+ViewComponent.prototype.parseActionAttribute = function(actionName, action){
+	var paramsDelimiter, params = [], executable;
+	actionName = actionName.replace('action-', '');
+	action = action.split('|');
+	if(action.length > 1){
+		params = action[1].split(",").map(function(elem){
+			return elem.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+		});
+	}
+	
+	executable = this.findExecutable(action[0], params);
+	
+	return {name : actionName, executable : executable};
+};
+
 
 
 //****************************
@@ -183,7 +206,7 @@ ViewComponent.register = function(name, object){
 ViewComponent.extend = function(object, parent){
 	var i;
 	var F = function(config, parent){
-		var i, actionName;
+		var i, actionInfo;
 		for(i in object){
 			if(object.hasOwnProperty(i)){
 				this[i] = object[i];
@@ -198,8 +221,8 @@ ViewComponent.extend = function(object, parent){
 		
 		for(i in config){
 			if(config.hasOwnProperty(i) && i.indexOf('action-') >= 0){
-				actionName = i.replace('action-', '');
-				config[actionName] = this.findExecutable(config[i]);
+				actionInfo = this.parseActionAttribute(i, config[i]);
+				config[actionInfo.name] = actionInfo.executable;
 			}
 		}
 		
@@ -244,7 +267,6 @@ ViewComponent.scanNode = function(node, parent){
 	if(!ViewComponent.registeredComponents.hasOwnProperty(node.nodeName.toUpperCase())){
 		return;
 	}
-	
 	
 	for(i = 0; i < node.attributes.length; i++){
 		attValue = node.attributes[i].value;

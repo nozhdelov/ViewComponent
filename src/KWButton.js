@@ -2,6 +2,14 @@
 
 ViewComponent.KWButton = ViewComponent.register('KWButton', {
 	
+	actions:{
+		doStuff : function(a,b){
+			var args = Array.prototype.slice.call(arguments);
+			alert(args.join(","));
+			alert(b);
+		}
+	},
+	
 	value : 'button',
 	action : function(){},
 	disable : false,
@@ -25,12 +33,7 @@ ViewComponent.KWButton = ViewComponent.register('KWButton', {
 		if(config.action){
 			if(typeof config.action === 'function'){
 				this.action = config.action;
-			} else {
-				action = this.findExecutable(config.action);
-				if(action){
-					this.action = action;
-				}
-			}
+			} 
 			
 		}
 	},
