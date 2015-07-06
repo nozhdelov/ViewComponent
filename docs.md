@@ -27,7 +27,7 @@ Used for initialization of the component. The init method is called automaticly 
             this.myName = config.name;
         }
     });
-    ```
+```
 ### <a name="methodRender"></a>render 
 The render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
 
