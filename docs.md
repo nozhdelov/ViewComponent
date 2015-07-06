@@ -1,7 +1,8 @@
 ## **Api Reference**
 
 Methods 
-- init - used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
+- ###init 
+     Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
 
 
 `
@@ -13,7 +14,8 @@ Methods
         }
     });
     `
-- render - the render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
+- ###render 
+     The render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
 
 `
          
