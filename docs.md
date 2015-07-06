@@ -2,9 +2,9 @@
 Methods 
 
 - [init](#methodInit)
-- render
-- rerender
-- destroy
+- [render](#methodRender)
+- [rerender](#methodRerender)
+- [destroy](#methodDestroy)
 
 ### <a name="methodInit"></a>init 
 Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
@@ -19,7 +19,7 @@ Used for initialization of the component. The init method is called automaticly 
         }
     });
     `
-###render 
+### <a name="methodRender"></a>render 
 The render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
 
 `
@@ -50,7 +50,7 @@ The render method is used for rendering the component on the screen. Its return 
     });`
     
     
-###rerender
+###<a name="methodRerender"></a>rerender
 The rerender method is used for updating the component's content. When some state changes inside the component the rerender method can be called to update the DOM.
      
      `
