@@ -15,8 +15,9 @@ Methods
     `
 - render - the render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
 
-    
-    
+`
+         
+   
      var MyComponent = ViewComponent.register('MyComponent, {
         myName : 0,
         render : function(){
@@ -39,5 +40,5 @@ Methods
         render : function(){
             return $.get('www.example.com/myContent');
         }
-    });
+    });`
 
