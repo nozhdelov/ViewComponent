@@ -54,17 +54,18 @@ Methods
         btn : null,
         init : function(){
           this.btn = document.createElement(button);
-          btn.addEventListener('click', function(){
+          this.btn.addEventListener('click', function(){
                this.caption = 'Thank you';
                this.rerender();
           }.bind(this));
         },
         
         render : function(){
-               btn.value = this.caption;
+               this.btn.value = this.caption;
                return this.btn;
         }
      });
      
      `
+
 
