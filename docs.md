@@ -5,6 +5,7 @@ Methods
 
 
 `
+
      var MyComponent = ViewComponent.register('MyComponent, {
         myName : 0,
         init : function(config){
