@@ -141,22 +141,23 @@ component.appendTo(someDomNode);
 
 <p><strong>Query selectors</strong></p>
 
-<p>Every component can search its descendants by a given criteria using the "find" method 
-      var MyComponent = ViewComponent.register('MyComponent, {
-        myName : 0,
-        init : function(config){
-            this.myName = config.name;
-        },
-        render : function(){
-            return '<p>Hi, my name is ' + this.myName + '.</p>';
-        }</p>
+<p>Every component can search its descendants by a given criteria using the "find" method </p>
 
-<pre><code>    this.on('parsed', function(){
+<pre><code> ` var MyComponent = ViewComponent.register('MyComponent, {
+    myName : 0,
+    init : function(config){
+        this.myName = config.name;
+    },
+    render : function(){
+        return '&lt;MyHeadingComponent&gt;&lt;p&gt;Hi, my name is ' + this.myName + '.&lt;/p&gt;&lt;/MyHeadingComponent&gt;';
+    }
+
+    this.on('parsed', function(){
         var headings = this.find('MyHeadingComponent');
         headings[0].doSomeStuff();
     }.bind(this));
 
-});
+});`
 </code></pre>
       </section>
     </div>
