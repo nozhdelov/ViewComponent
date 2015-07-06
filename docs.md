@@ -6,7 +6,7 @@ Methods
 - rerender
 - destroy
 
-###init 
+### <a name="methodInit"></a>init 
 Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
 
 
