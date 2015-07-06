@@ -16,7 +16,7 @@ The main principles ViewComponent is built on are as follows :
   
 
      var MyComponent = ViewComponent.register('MyComponent, {
-        myName : 0,
+        myName : 'Ivan',
     	init : function(config){
     	    this.myName = config.name;
     	},
