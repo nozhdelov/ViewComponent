@@ -19,7 +19,7 @@ Events
 Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
 
 
-`
+```
 
      var MyComponent = ViewComponent.register('MyComponent, {
         myName : 0,
@@ -27,7 +27,7 @@ Used for initialization of the component. The init method is called automaticly 
             this.myName = config.name;
         }
     });
-    `
+    ```
 ### <a name="methodRender"></a>render 
 The render method is used for rendering the component on the screen. Its return value must be a string, a DOM node or a promise (every object that implements then and fail methods is considered a promise) 
 
