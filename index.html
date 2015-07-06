@@ -152,7 +152,8 @@ component.appendTo(someDomNode);
         }</p>
 
 <pre><code>    this.on('parsed', function(){
-        this.find('MyHeadingComponent');
+        var headings = this.find('MyHeadingComponent');
+        headings[0].doSomeStuff();
     }.bind(this));
 
 });
