@@ -1,4 +1,4 @@
-## **Api Reference**
+## **API Reference**
 Methods 
 
 - [init](#methodInit)
@@ -129,7 +129,7 @@ The *find* method returns an array with components that are children of the call
 Properties
 
 --
-###<a name="proptParent"></a>parent
+###<a name="propParent"></a>parent
 A reference to the parent component or null if the component does not have parent
 
 ###<a name="propChildren"></a>children
