@@ -8,12 +8,24 @@ Methods
 - [find](#methodFind)
 
 
+
+--
+- [parent](#propParent)
+
+Properties
+- [parent](#propParent)
+- [children](#propChildren)
+- [parentNode](#propParentNode)
+- [nodeContent](#propNodeContent)
+- [parent](#propactions)
+
+
 --
 
 Events
 - [parsed](#eventParsed)
 - [render](#eventRender)
-- [destroy](#destroy)
+- [destroy](#eventDestroy)
 
 ### <a name="methodInit"></a>init 
 Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
@@ -112,6 +124,26 @@ The *find* method returns an array with components that are children of the call
 
 
 ----
+
+Properties
+
+--
+###<a name="proptParent"></a>parent
+A reference to the parent component or null if the component does not have parent
+
+###<a name="propChildren"></a>children
+An array holding list of the child components of a given component
+
+###<a name="propParentNode"></a>parentNode
+A reference to the DOM element containing the component.
+
+###<a name="propNodeContent"></a>nodeContent
+The HTML between the open and close tag of the component.
+
+###<a name="propActions"></a>actions
+A map containing functions that can be used with the *action-* attribute* in the HTML syntax.
+
+
 
 Events
 --
