@@ -10,6 +10,8 @@ The main principles ViewComponent is built on are as follows :
  4. Heavy  drinking
 
 
+[API Reference](https://github.com/nozhdelov/ViewComponent/blob/master/docs.md)
+
 **Declaring component**
 
   
