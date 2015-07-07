@@ -1,6 +1,6 @@
 ## **What is ViewComponent**
 ----------
-ViewComponent  is what would've happened if React fucked Ember and then a freakish baby was born.... and then it was dropped on its head.
+ViewComponent  is a small lightweight library for creating component based UIs.
 
 The main principles ViewComponent is built on are as follows : 
 
@@ -9,7 +9,6 @@ The main principles ViewComponent is built on are as follows :
  3. Nesting those components to create more complex ones
  4. Heavy  drinking
 
-(this is for the first day of writing)
 
 **Declaring component**
 
