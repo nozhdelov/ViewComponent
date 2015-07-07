@@ -142,6 +142,7 @@ Eemitted when the render content is ready and is about to be inserted in the DOM
      
 ###<a name="eventRender"></a>render
 Emitted after the content is inserted in the DOM. At this stage the content can be selected and manipolated with the DOM API or with libraries like JQuery;
+
 `
     var MyComponent = ViewComponent.register('MyComponent, {
         init : function(){
@@ -158,3 +159,4 @@ Emitted after the content is inserted in the DOM. At this stage the content can 
         }
      });
 
+`
