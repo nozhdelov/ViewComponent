@@ -144,7 +144,8 @@ Eemitted when the render content is ready and is about to be inserted in the DOM
 Emitted after the content is inserted in the DOM. At this stage the content can be selected and manipolated with the DOM API or with libraries like JQuery;
 
 `
-    var MyComponent = ViewComponent.register('MyComponent, {
+
+     var MyComponent = ViewComponent.register('MyComponent, {
         init : function(){
         
           this.on('render', function(){
@@ -160,3 +161,7 @@ Emitted after the content is inserted in the DOM. At this stage the content can 
      });
 
 `
+
+
+###<a name="eventDestroy"></a>destroy
+emitted when the "destroy" method is called or the component is destroyed for some other reason (For example the parent component is rerendering) 
