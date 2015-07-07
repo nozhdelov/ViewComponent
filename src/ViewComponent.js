@@ -20,7 +20,7 @@ ViewComponent.prototype.init = function(){
 
 
 ViewComponent.prototype.render = function(){
-	return "";
+	return this.nodeContent;
 };
 
 
@@ -49,12 +49,10 @@ ViewComponent.prototype.prepare = function(tree){
 		div = document.createElement('div');
 		div.innerHTML = tree;
 		fragment = document.createDocumentFragment();
-	
 		for(i = 0; i < div.childNodes.length; i++){
-			
-			fragment.appendChild(div.childNodes[i]);
+			fragment.appendChild(div.childNodes[i].cloneNode(true));
 		}
-		
+		div.innerHTML = '';
 		tree = fragment;
 	} else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
@@ -192,6 +190,10 @@ ViewComponent.prototype.parseActionAttribute = function(actionName, action){
 };
 
 
+ViewComponent.prototype.find = function(selector){
+	return ViewComponent.find(selector, this);
+};
+
 
 //****************************
 
@@ -288,5 +290,62 @@ ViewComponent.scanNode = function(node, parent){
 	});
 	
 	
+	
+};
+
+
+
+ViewComponent.traverseComponentTree = function(node, callback){
+	var i;
+	if(!node){
+		return;
+	}
+	callback(node);
+	for(i = 0; i < node.children.length; i++){
+		ViewComponent.traverseComponentTree(node.children[i], callback);
+	}
+};
+
+
+
+
+
+ViewComponent.find = function(selector, root){
+	var results = [];
+	if(root === undefined){
+		root = ViewComponent.rootComponent;
+	}
+	ViewComponent.traverseComponentTree(root, function(node){
+		if(ViewComponent.selectorMatches(selector, node)){
+			results.push(node);
+		}
+	});
+	
+	return results;
+};
+
+
+ViewComponent.selectorMatches = function(selector, node){
+	var parts, i, matched;
+	var selectors = selector.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').split(' ');
+	
+	for(i = 0; i < selectors.length; i++){
+		selectors[i] = selectors[i].replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+		parts = selectors[i].split('=');
+		matched = false;
+
+		if(parts.length > 1){
+			matched = node[parts[0]] !== undefined && node[parts[0]] === parts[1].toString();
+		} else {
+			matched = node instanceof ViewComponent.registeredComponents[parts[0].toUpperCase()]; 
+		}
+		
+		if(!matched){
+			return false;
+		}
+		
+	}
+	
+	return true;
 	
 };
