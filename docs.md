@@ -98,8 +98,6 @@ The *find* method returns an array with components that are children of the call
      </MyComponent>
      
      var MyComponent = ViewComponent.register('MyComponent, {
-        caption : 'Press me',
-        btn : null,
         init : function(){
         
           this.on('parsed', function(){
@@ -107,17 +105,56 @@ The *find* method returns an array with components that are children of the call
           });
         },
         
-        render : function(){
-         
-        }
+       
      });
      
      `
 
+
 ----
+
 Events
 --
 ###<a name="eventParsed"></a>parsed
 Eemitted when the render content is ready and is about to be inserted in the DOM. At this stage the component`s children are discovered.
 
+    
+     `
+     
+     <MyComponent>
+          <MyButton id="1" ></MyButton>
+          <MyButton id="2" ></MyButton>
+          <MyButton id="3" ></MyButton>
+     </MyComponent>
+     
+     var MyComponent = ViewComponent.register('MyComponent, {
+        init : function(){
+        
+          this.on('parsed', function(){
+               var children = this.find('MyButton id=2');
+          });
+        },
+        
+       
+     });
+     
+     `
+     
+###<a name="eventRender"></a>render
+Emitted after the content is inserted in the DOM. At this stage the content can be selected and manipolated with the DOM API or with libraries like JQuery;
+`
+    var MyComponent = ViewComponent.register('MyComponent, {
+        init : function(){
+        
+          this.on('render', function(){
+               document.getElementById('myBtn').addEventListener('click', function(){
+                    this.value = "Thank you";
+               });
+          });
+        },
+        
+        render : function(){
+          return '<input id="myBtn" type="button" value="press me" />';
+        }
+     });
 
