@@ -37,7 +37,7 @@
 
 <hr>
 
-<p>ViewComponent  is what would've happened if React fucked Ember and then a freakish baby was born.... and then it was dropped on its head.</p>
+<p>ViewComponent  is a small lightweight library for creating component based UIs.</p>
 
 <p>The main principles ViewComponent is built on are as follows : </p>
 
@@ -48,12 +48,10 @@
 <li>Heavy  drinking</li>
 </ol>
 
-<p>(this is for the first day of writing)</p>
-
 <p><strong>Declaring component</strong></p>
 
 <pre><code> var MyComponent = ViewComponent.register('MyComponent, {
-    myName : 0,
+    myName : 'Ivan',
     init : function(config){
         this.myName = config.name;
     },
