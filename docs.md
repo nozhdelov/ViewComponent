@@ -114,6 +114,10 @@ The *find* method returns an array with components that are children of the call
      
      `
 
-
+----
+Events
+--
+###<a name="eventParsed"></a>parsed
+Eemitted when the render content is ready and is about to be inserted in the DOM. At this stage the component`s children are discovered.
 
 
