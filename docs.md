@@ -10,14 +10,14 @@ Methods
 
 
 --
-- [parent](#propParent)
+
 
 Properties
 - [parent](#propParent)
 - [children](#propChildren)
 - [parentNode](#propParentNode)
 - [nodeContent](#propNodeContent)
-- [parent](#propactions)
+- [actions](#propActions)
 
 
 --
@@ -27,8 +27,10 @@ Events
 - [render](#eventRender)
 - [destroy](#eventDestroy)
 
-### <a name="methodInit"></a>init 
+### <a name="methodInit"></a>init(config)
 Used for initialization of the component. The init method is called automaticly on component creation. It receives a *config* object that is either passed in the constructor with the JS syntax or captured from the DOM attributes when using the HTML syntax;
+* config
+Type : object
 
 
 ```
@@ -141,7 +143,7 @@ A reference to the DOM element containing the component.
 The HTML between the open and close tag of the component.
 
 ###<a name="propActions"></a>actions
-A map containing functions that can be used with the *action-* attribute* in the HTML syntax.
+A map containing functions that can be used with the *action-?* attribute in the HTML syntax.
 
 
 
