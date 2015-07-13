@@ -128,11 +128,11 @@ ViewComponent.prototype.getParent = function(){
 
 
 ViewComponent.prototype.findExecutable = function(name, params){
-	var parent;
+	var parent, self = this;
 	if(this.actions[name]){
 		return function(){
 			var args = Array.prototype.slice.call(arguments).concat(params);
-			this.actions[name].apply(this, args);
+			self.actions[name].apply(self, args);
 		};
 	}
 	parent = this.getParent();
@@ -152,23 +152,38 @@ ViewComponent.prototype.findExecutable = function(name, params){
 
 
 ViewComponent.prototype.destroy = function(){
+	this.on('destroy', function(){
+		this.off();
+	}.bind(this));
 	this.emit('destroy');
 	this.children.forEach(function(child){
 		child.destroy();
 	});
 	
 	this.removeFromDOM();
+	if(this.parent){
+		this.parent.removeChild(this);
+	}
+	
+
 };
 
 
 
 ViewComponent.prototype.removeFromDOM = function(){
-	return;
-	this.renderTree.forEach(function(node){
-		if(node.parentNode){
-			node.parentNode.removeChild(node);
+
+	if(typeof this.tenderTree === 'object' && this.tenderTree.length){
+		this.renderTree.forEach(function(node){
+			if(node && node.parentNode){
+				node.parentNode.removeChild(node);
+			}
+		});
+	} else {
+		if(this.renderTree.parentNode){
+			this.renderTree.parentNode.removeChild(this.renderTree);
 		}
-	});
+	}
+	
 	
 };
 
@@ -187,6 +202,12 @@ ViewComponent.prototype.parseActionAttribute = function(actionName, action){
 	executable = this.findExecutable(action[0], params);
 	
 	return {name : actionName, executable : executable};
+};
+
+ViewComponent.prototype.callAction = function(actionName){
+	var args = Array.prototype.slice.call(arguments);
+	args.shift();
+	return this.findExecutable(actionName, args)();
 };
 
 
@@ -283,6 +304,7 @@ ViewComponent.scanNode = function(node, parent){
 	
 	component.nodeContent = node.innerHTML;
 	component.parentNode = node.parentNode;
+	node.innerHTML = '';
 	component.getRenderable().then(function(tree){
 		node.parentNode.insertBefore(tree, node);
 		node.parentNode.removeChild(node);
