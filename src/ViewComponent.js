@@ -61,7 +61,7 @@ ViewComponent.prototype.prepare = function(tree){
 	if(tree.nodeType === 11){		
 		this.renderTree = Array.prototype.slice.call(tree.childNodes, 0);
 	} else {
-		this.renderTree = tree;
+		this.renderTree = [tree];
 	}
 	
 	
