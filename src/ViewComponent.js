@@ -100,7 +100,10 @@ ViewComponent.prototype.rerender = function(){
 	var insertionNode = this.renderTree[0];
 	var oldThree = this.renderTree.slice();
 	var self = this;
-
+	this.children.forEach(function(child){
+		child.destroy();
+	});
+	this.children = [];
 	
 	this.getRenderable().then(function(tree){
 		self.parentNode.insertBefore(tree, insertionNode);
@@ -159,6 +162,8 @@ ViewComponent.prototype.destroy = function(){
 	this.children.forEach(function(child){
 		child.destroy();
 	});
+	
+	this.children = [];
 	
 	this.removeFromDOM();
 	if(this.parent){
