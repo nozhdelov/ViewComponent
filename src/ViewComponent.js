@@ -29,11 +29,20 @@ ViewComponent.prototype.render = function(){
 ViewComponent.prototype.getRenderable = function(){ 
 	var tree = this.render();
 	var deferred = Q.defer();
-	var self = this;
+	var self = this, i;
 	if(typeof tree === 'object' && tree.then && tree.fail){
 		tree.then(function(res){
 			deferred.resolve(self.prepare(res));
 		});
+	} else if(typeof tree === 'object' && tree.render){
+		for(i = 0; i < ViewComponent.registeredComponents.length; i++){
+			if(tree instanceof ViewComponent.registeredComponents[i]){
+				tree.getRenderable().then(function(res){
+					deferred.resolve(self.prepare(res));
+				});
+			}
+		}
+		
 	} else {
 		deferred.resolve(self.prepare(tree));
 	}
@@ -54,7 +63,7 @@ ViewComponent.prototype.prepare = function(tree){
 		}
 		div.innerHTML = '';
 		tree = fragment;
-	} else if(!tree instanceof HTMLElement) {
+	}  else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
 	}
 	
@@ -98,23 +107,32 @@ ViewComponent.prototype.appendTo = function(node){
 
 ViewComponent.prototype.rerender = function(){
 	var insertionNode = this.renderTree[0];
-	var oldThree = this.renderTree.slice();
+	var oldThree = this.renderTree;
+	var oldChildren = this.children.slice();
 	var self = this;
+	
 	this.children.forEach(function(child){
 		child.destroy();
 	});
 	this.children = [];
 	
 	this.getRenderable().then(function(tree){
+		
 		self.parentNode.insertBefore(tree, insertionNode);
-		oldThree.forEach(function(node){
-		if(node.parentNode){
-			node.parentNode.removeChild(node);
-		}
 		
-		self.emit('render');
-	});
 		
+		
+		oldThree.forEach(function(node){	
+			if(node.parentNode){
+				node.parentNode.removeChild(node);
+			}
+		});
+		
+		oldChildren.forEach(function(child){
+			child.removeFromDOM();
+		});
+		
+		self.emit('render');	
 	});
 	
 };
@@ -124,6 +142,13 @@ ViewComponent.prototype.addChild = function(child){
 	this.children.push(child);
 };
 
+ViewComponent.prototype.removeChild = function(child){
+	var index = this.children.indexOf(child);
+	if(index >= 0){
+		this.children.splice(index, 1);
+	}
+	
+};
 
 ViewComponent.prototype.getParent = function(){
 	return this.parent;
@@ -163,9 +188,7 @@ ViewComponent.prototype.destroy = function(){
 		child.destroy();
 	});
 	
-	this.children = [];
-	
-	this.removeFromDOM();
+//	this.removeFromDOM();
 	if(this.parent){
 		this.parent.removeChild(this);
 	}
@@ -176,17 +199,12 @@ ViewComponent.prototype.destroy = function(){
 
 
 ViewComponent.prototype.removeFromDOM = function(){
-
-	if(typeof this.tenderTree === 'object' && this.tenderTree.length){
+	if(typeof this.renderTree === 'object' && this.renderTree && this.renderTree.length){
 		this.renderTree.forEach(function(node){
 			if(node && node.parentNode){
 				node.parentNode.removeChild(node);
 			}
 		});
-	} else {
-		if(this.renderTree.parentNode){
-			this.renderTree.parentNode.removeChild(this.renderTree);
-		}
 	}
 	
 	
@@ -209,6 +227,7 @@ ViewComponent.prototype.parseActionAttribute = function(actionName, action){
 	return {name : actionName, executable : executable};
 };
 
+
 ViewComponent.prototype.callAction = function(actionName){
 	var args = Array.prototype.slice.call(arguments);
 	args.shift();
@@ -224,6 +243,7 @@ ViewComponent.prototype.find = function(selector){
 //****************************
 
 ViewComponent.registeredComponents = {};
+ViewComponent.rootComponent = null;
 
 
 ViewComponent.register = function(name, object){
@@ -256,6 +276,7 @@ ViewComponent.extend = function(object, parent){
 			}
 		}
 		
+		this.events = {};
 		this.init(config);
 	};
 	
@@ -304,13 +325,14 @@ ViewComponent.scanNode = function(node, parent){
 		config[attName] = attValue;
 	}
 	
-	
 	component = new ViewComponent.registeredComponents[node.nodeName.toUpperCase()](config, parent);
 	
 	component.nodeContent = node.innerHTML;
 	component.parentNode = node.parentNode;
+	component.node = node;
 	node.innerHTML = '';
 	component.getRenderable().then(function(tree){
+		component.fulfillParent(tree, node);
 		node.parentNode.insertBefore(tree, node);
 		node.parentNode.removeChild(node);
 		component.emit('render');
@@ -320,7 +342,29 @@ ViewComponent.scanNode = function(node, parent){
 	
 };
 
+ViewComponent.prototype.fulfillParent = function(tree, componentNode){
+	var i, parts = [];
+	if(!this.parent){
+		return;
+	}
 
+	for(i = 0; i < this.parent.renderTree.length; i++){
+		if(componentNode === this.parent.renderTree[i]){
+			if(tree.nodeType === 11){
+				parts[0] = this.renderTree.slice(0, i);
+				parts[1] = Array.prototype.slice(tree.childNodes);
+				parts[2] = this.renderTree.slice(i, this.renderTree.length);
+				
+				
+				this.parent.renderTree = parts[0].concat(parts[1]).concat(parts[2]);
+			} else {
+				this.parent.renderTree[i] = tree;
+			}
+			
+		}
+		
+	}
+};
 
 ViewComponent.traverseComponentTree = function(node, callback){
 	var i;
