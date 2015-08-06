@@ -1,13 +1,7 @@
 'use strict';
 
 function ViewComponent(){
-	this.parent = null;
-	this.children = [];
-	this.renderTree = null;
-	this.parentNode = null;
-	this.nodeContent = '';
-	this.actions = {};
-	this.events = {};
+	
 	
 };
 
@@ -117,8 +111,8 @@ ViewComponent.prototype.rerender = function(){
 	this.children = [];
 	
 	this.getRenderable().then(function(tree){
-		
-		self.parentNode.insertBefore(tree, insertionNode);
+		var parent = self.parentNode.nodeType !== 11 ? self.parentNode : insertionNode.parentNode;
+		parent.insertBefore(tree, insertionNode);
 		
 		
 		
@@ -257,6 +251,15 @@ ViewComponent.extend = function(object, parent){
 	var i;
 	var F = function(config, parent){
 		var i, actionInfo;
+		
+		this.parent = null;
+		this.children = [];
+		this.renderTree = null;
+		this.parentNode = null;
+		this.nodeContent = '';
+		this.actions = {};
+		this.events = {};
+		
 		for(i in object){
 			if(object.hasOwnProperty(i)){
 				this[i] = object[i];
@@ -276,7 +279,6 @@ ViewComponent.extend = function(object, parent){
 			}
 		}
 		
-		this.events = {};
 		this.init(config);
 	};
 	
