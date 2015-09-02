@@ -154,7 +154,7 @@ ViewComponent.prototype.findExecutable = function(name, params){
 	if(this.actions[name]){
 		return function(){
 			var args = Array.prototype.slice.call(arguments).concat(params);
-			self.actions[name].apply(self, args);
+			return self.actions[name].apply(self, args);
 		};
 	}
 	parent = this.getParent();
@@ -162,7 +162,7 @@ ViewComponent.prototype.findExecutable = function(name, params){
 		if(parent.actions[name]){
 			return function(){
 				var args = Array.prototype.slice.call(arguments).concat(params);
-				parent.actions[name].apply(parent, args);
+				return parent.actions[name].apply(parent, args);
 			};
 		}
 		parent = parent.getParent();
