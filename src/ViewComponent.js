@@ -1,5 +1,6 @@
 'use strict';
 
+
 function ViewComponent(){
 	
 	
@@ -89,7 +90,10 @@ ViewComponent.prototype.appendTo = function(node){
 	
 	this.parentNode = node;
 	this.getRenderable().then(function(res){
-		node.appendChild(res);
+		var componentNode = document.createElement(self.componentName);
+		self.node = componentNode;
+		componentNode.appendChild(res);
+		node.appendChild(componentNode);
 		self.emit('render');
 	}).fail(function(res){
 		throw new Error(res);
@@ -100,7 +104,6 @@ ViewComponent.prototype.appendTo = function(node){
 
 
 ViewComponent.prototype.rerender = function(){
-	var insertionNode = this.renderTree[0];
 	var oldThree = this.renderTree;
 	var oldChildren = this.children.slice();
 	var self = this;
@@ -111,10 +114,10 @@ ViewComponent.prototype.rerender = function(){
 	this.children = [];
 	
 	this.getRenderable().then(function(tree){
-		var parent = self.parentNode.nodeType !== 11 ? self.parentNode : insertionNode.parentNode;
-		parent.insertBefore(tree, insertionNode);
-		
-		
+		if(self.node){
+			self.node.innerHTML = '';
+		}
+		self.node.appendChild(tree);
 		
 		oldThree.forEach(function(node){	
 			if(node.parentNode){
@@ -241,16 +244,17 @@ ViewComponent.rootComponent = null;
 
 
 ViewComponent.register = function(name, object){
-	var component = ViewComponent.extend(object);
+	var component = ViewComponent.extend(object, name);
 	ViewComponent.registeredComponents[name.toUpperCase()] = component;
 	return component;
 };
 
 
-ViewComponent.extend = function(object, parent){
+ViewComponent.extend = function(object, name){
 	var i;
-	var F = function(config, parent){
+	var F = function(config, parent, node){
 		var i, actionInfo;
+		config = config || {};
 		
 		this.parent = null;
 		this.children = [];
@@ -259,6 +263,15 @@ ViewComponent.extend = function(object, parent){
 		this.nodeContent = '';
 		this.actions = {};
 		this.events = {};
+		this.componentName = name;
+		
+		if(node){
+			this.nodeContent = node.innerHTML;
+			this.parentNode = node.parentNode;
+			this.node = node;
+		}
+		
+	
 		
 		for(i in object){
 			if(object.hasOwnProperty(i)){
@@ -279,7 +292,10 @@ ViewComponent.extend = function(object, parent){
 			}
 		}
 		
-		this.init(config);
+		if(typeof this.init === 'function'){
+			this.init(config);
+		}
+		
 	};
 	
 	F.prototype = new ViewComponent();
@@ -315,58 +331,41 @@ ViewComponent.scan = function(node){
 
 
 ViewComponent.scanNode = function(node, parent){
-	var attName, attValue, i, component, config = {};
-	
-	if(!ViewComponent.registeredComponents.hasOwnProperty(node.nodeName.toUpperCase())){
-		return;
-	}
-	
-	for(i = 0; i < node.attributes.length; i++){
-		attValue = node.attributes[i].value;
-		attName = node.attributes[i].nodeName;
-		config[attName] = attValue;
-	}
-	
-	component = new ViewComponent.registeredComponents[node.nodeName.toUpperCase()](config, parent);
-	
-	component.nodeContent = node.innerHTML;
-	component.parentNode = node.parentNode;
-	component.node = node;
-	node.innerHTML = '';
-	component.getRenderable().then(function(tree){
-		component.fulfillParent(tree, node);
-		node.parentNode.insertBefore(tree, node);
-		node.parentNode.removeChild(node);
-		component.emit('render');
-	});
+	var attName, attValue, i, config = {};
 	
 	
 	
-};
+	if(node.attributes !== undefined){
+		for(i = 0; i < node.attributes.length; i++){
+			attValue = node.attributes[i].value;
+			attName = node.attributes[i].nodeName;
+			config[attName] = attValue;
 
-ViewComponent.prototype.fulfillParent = function(tree, componentNode){
-	var i, parts = [];
-	if(!this.parent){
-		return;
-	}
-
-	for(i = 0; i < this.parent.renderTree.length; i++){
-		if(componentNode === this.parent.renderTree[i]){
-			if(tree.nodeType === 11){
-				parts[0] = this.renderTree.slice(0, i);
-				parts[1] = Array.prototype.slice(tree.childNodes);
-				parts[2] = this.renderTree.slice(i, this.renderTree.length);
-				
-				
-				this.parent.renderTree = parts[0].concat(parts[1]).concat(parts[2]);
-			} else {
-				this.parent.renderTree[i] = tree;
+			if(ViewComponent.registeredComponents.hasOwnProperty(attName.toUpperCase())){
+				ViewComponent.createComponent(attName, config, parent, node);
 			}
 			
 		}
-		
 	}
+	
+	if(ViewComponent.registeredComponents.hasOwnProperty(node.nodeName.toUpperCase())){
+		ViewComponent.createComponent(node.nodeName, config, parent, node);
+	}
+	
 };
+
+
+ViewComponent.createComponent = function(componentName, config, parent, node, attName){
+
+	var component = new ViewComponent.registeredComponents[componentName.toUpperCase()](config, parent, node);
+	
+	node.innerHTML = '';
+	component.getRenderable().then(function(tree){
+		node.appendChild(tree, node);
+		component.emit('render');
+	});
+};
+
 
 ViewComponent.traverseComponentTree = function(node, callback){
 	var i;

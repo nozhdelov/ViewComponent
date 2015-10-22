@@ -8,11 +8,18 @@ ViewComponent.AsyncContent = ViewComponent.register('AsyncContent', {
 	
 	render : function() {
 		var deferred = Q.defer();
-		
+		var self = this;
 		setTimeout(function(){
-			deferred.resolve('<h1>wats aaaaaaaaap</h1> <KWButton action="op"></KWButton>\n\
+			var time = Date.now();
+			deferred.resolve('<h1>wats aaaaaaaaap '+time+' </h1> <KWButton action="op"></KWButton>\n\
 <KWButton></KWButton><KWButton></KWButton><KWButton></KWButton>');
-		}, 4000);
+			setTimeout(function(){
+				self.rerender();		
+			}, 1000);
+			
+		}, 1000);
+		
+
 		
 		return deferred.promise;
 	}
