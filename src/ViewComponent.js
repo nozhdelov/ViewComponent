@@ -335,7 +335,7 @@ ViewComponent.scanNode = function(node, parent){
 	
 	
 	
-	if(node.attributes !== undefined){
+	if(node.attributes !== undefined && node.attributes !== null){
 		for(i = 0; i < node.attributes.length; i++){
 			attValue = node.attributes[i].value;
 			attName = node.attributes[i].nodeName;
