@@ -243,19 +243,21 @@ ViewComponent.registeredComponents = {};
 ViewComponent.rootComponent = null;
 
 
-ViewComponent.register = function(name, object){
-	var component = ViewComponent.extend(object, name);
+ViewComponent.register = function(name, object, ancestor){
+	var component = ViewComponent.extend(object, name, ancestor);
 	ViewComponent.registeredComponents[name.toUpperCase()] = component;
 	return component;
 };
 
 
-ViewComponent.extend = function(object, name){
+ViewComponent.extend = function(object, name, ancestor){
 	var i;
+	var ancestorInstance = typeof ancestor === 'function' ? new ancestor(object) : null;
 	var F = function(config, parent, node){
 		var i, actionInfo;
 		config = config || {};
 		
+		this.ancestor = ancestorInstance;
 		this.parent = null;
 		this.children = [];
 		this.renderTree = null;
@@ -298,8 +300,8 @@ ViewComponent.extend = function(object, name){
 		
 	};
 	
-	F.prototype = new ViewComponent();
-	
+	F.prototype = typeof ancestor === 'function' ? ancestorInstance : new ViewComponent();
+
 	return F;
 };
 
@@ -332,8 +334,6 @@ ViewComponent.scan = function(node){
 
 ViewComponent.scanNode = function(node, parent){
 	var attName, attValue, i, config = {};
-	
-	
 	
 	if(node.attributes !== undefined && node.attributes !== null){
 		for(i = 0; i < node.attributes.length; i++){
