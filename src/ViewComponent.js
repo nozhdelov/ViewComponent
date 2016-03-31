@@ -6,7 +6,70 @@ function ViewComponent(){
 	
 };
 
-ViewComponent.prototype = new EventEmitter();
+ViewComponent.prototype.on = function (type, handler) {
+	if(typeof handler !== 'function'){
+		return false;
+	}
+	
+	if(!this.hasOwnProperty('events')){
+		this.events = {};
+	}
+	
+	if(this.events[type] === undefined){
+		this.events[type] = [];
+	}
+	this.events[type].push(handler);
+};
+
+
+ViewComponent.prototype.off = function (type, handler) {
+	var index;
+	
+	if(type === undefined && handler === undefined){
+		this.events = {};
+	}
+	
+	if(this.events[type] === undefined){
+		return false;
+	}
+	
+	if(!this.hasOwnProperty('events')){
+		this.events = {};
+	}
+
+	if(handler !== undefined){
+		index = this.events[type].indexOf(handler);
+		if(index < 0){
+			return false;
+		}
+		this.events[type].splice(index, 1);
+	} else {
+		this.events[type].length = 0;
+	}
+	
+};
+
+
+
+
+ViewComponent.prototype.emit = function (type, data) {
+	var i, self = this;
+	data = data || {};
+	var self = this;
+	
+	if(this.events[type] !== undefined){
+		for(i = 0; i < this.events[type].length; i++){
+			setTimeout((function(index){
+				return function(){
+					if(self.events[type][index]){
+						self.events[type][index](data);
+					}
+				};
+			}(i)), 0);
+		}
+	}	
+	
+};
 
 
 ViewComponent.prototype.init = function(){
@@ -49,36 +112,45 @@ ViewComponent.prototype.getRenderable = function(){
 ViewComponent.prototype.prepare = function(tree){
 	var div, i, fragment;
 	var self = this;
-	if(typeof tree === 'string'){
+	this.renderTree = tree;
+	ViewComponent.executePluginCallbacks('componentRender', this);
+	
+	if(typeof this.renderTree === 'string'){
 		div = document.createElement('div');
-		div.innerHTML = tree;
+		div.innerHTML = this.renderTree;
 		fragment = document.createDocumentFragment();
 		for(i = 0; i < div.childNodes.length; i++){
 			fragment.appendChild(div.childNodes[i].cloneNode(true));
 		}
 		div.innerHTML = '';
-		tree = fragment;
+		this.renderTree = fragment;
 	}  else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
 	}
 	
+	
+	
+	
+	/*
 	if(tree.nodeType === 11){		
 		this.renderTree = Array.prototype.slice.call(tree.childNodes, 0);
 	} else {
 		this.renderTree = [tree];
-	}
+	}*/
 	
 	
-
+	ViewComponent.executePluginCallbacks('componentStartScan', this);
 	
-	ViewComponent.traverseTree(tree, function(node){
+	ViewComponent.traverseTree(this.renderTree, function(node){
 		ViewComponent.scanNode(node, self);
 	});
+	
+	ViewComponent.executePluginCallbacks('componentEndScan', this);
 	
 
 	this.emit('parsed');
 	
-	return tree;
+	return this.renderTree;
 };
 
 
@@ -118,7 +190,7 @@ ViewComponent.prototype.rerender = function(){
 			self.node.innerHTML = '';
 		}
 		self.node.appendChild(tree);
-		
+		/*
 		oldThree.forEach(function(node){	
 			if(node.parentNode){
 				node.parentNode.removeChild(node);
@@ -127,7 +199,7 @@ ViewComponent.prototype.rerender = function(){
 		
 		oldChildren.forEach(function(child){
 			child.removeFromDOM();
-		});
+		});*/
 		
 		self.emit('render');	
 	});
@@ -193,19 +265,12 @@ ViewComponent.prototype.destroy = function(){
 
 };
 
-
-
 ViewComponent.prototype.removeFromDOM = function(){
-	if(typeof this.renderTree === 'object' && this.renderTree && this.renderTree.length){
-		this.renderTree.forEach(function(node){
-			if(node && node.parentNode){
-				node.parentNode.removeChild(node);
-			}
-		});
+	if(this.node.parentNode){
+		this.node.parentNode.removeChild(this.node);
 	}
-	
-	
 };
+
 
 
 
@@ -240,6 +305,7 @@ ViewComponent.prototype.find = function(selector){
 //****************************
 
 ViewComponent.registeredComponents = {};
+ViewComponent.plugins = {};
 ViewComponent.rootComponent = null;
 
 
@@ -273,7 +339,7 @@ ViewComponent.extend = function(object, name, ancestor){
 			this.node = node;
 		}
 		
-	
+		ViewComponent.executePluginCallbacks('componentCreate', this);
 		
 		for(i in object){
 			if(object.hasOwnProperty(i)){
@@ -298,17 +364,21 @@ ViewComponent.extend = function(object, name, ancestor){
 			this.init(config);
 		}
 		
+		
+		
 	};
 	
+	
+	
 	F.prototype = typeof ancestor === 'function' ? ancestorInstance : new ViewComponent();
-
+	ViewComponent.executePluginCallbacks('componentRegister', name);
 	return F;
 };
 
 
 
 ViewComponent.traverseTree = function (node, callback) {
-	if (node) {
+	if (node && !ViewComponent.nodeHasAttribute(node, 'vc-literal')) {
 		callback(node);
 	}
 	node = node.firstChild;
@@ -319,7 +389,10 @@ ViewComponent.traverseTree = function (node, callback) {
 	
 
 	while (node) {
-		ViewComponent.traverseTree(node, callback);
+		if(!ViewComponent.nodeHasAttribute(node, 'vc-literal')){
+			ViewComponent.traverseTree(node, callback);
+		}
+		
 		node = node.nextSibling;
 	}
 
@@ -352,6 +425,16 @@ ViewComponent.scanNode = function(node, parent){
 		ViewComponent.createComponent(node.nodeName, config, parent, node);
 	}
 	
+	ViewComponent.executePluginCallbacks('scanNode', node);
+	
+};
+
+
+ViewComponent.nodeHasAttribute = function(node, attribute){
+	if(node.hasAttribute){
+		return node.hasAttribute(attribute);
+	}
+	return false;
 };
 
 
@@ -364,6 +447,8 @@ ViewComponent.createComponent = function(componentName, config, parent, node, at
 		node.appendChild(tree, node);
 		component.emit('render');
 	});
+	
+	
 };
 
 
@@ -420,4 +505,31 @@ ViewComponent.selectorMatches = function(selector, node){
 	
 	return true;
 	
+};
+
+
+
+ViewComponent.registerPlugin = function(name, plugin){
+	if(typeof name !== 'string' || name === ''){
+		throw new Error('invalid pludin name');
+	}
+	if(typeof plugin !== 'object'){
+		throw new Error('invalid pludin');
+	}
+	ViewComponent.plugins[name] = plugin;
+	ViewComponent.executePluginCallbacks('init');
+};
+
+
+ViewComponent.executePluginCallbacks = function(type, obj){
+	var i;
+	
+	for(i in ViewComponent.plugins){
+		if(!ViewComponent.plugins.hasOwnProperty(i)){
+			continue;
+		}
+		if(typeof ViewComponent.plugins[i][type] === 'function'){
+			ViewComponent.plugins[i][type](obj);
+		}
+	}
 };
