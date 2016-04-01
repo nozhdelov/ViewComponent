@@ -109,3 +109,23 @@ Every component can search its descendants by a given criteria using the "find" 
         }.bind(this));
 
     });`
+
+
+
+
+----------
+**Plugins**
+
+ViewComponent has a simple plugin system, which gives access to some of the internals of the library
+
+To create a plugen use the ViewComponent.registerPlugin method. It takes as arguments a name and a object that contains some callbacks;
+These callbacks will be executed at different stages of the life cycle of every component.
+Posible callbacks are : 
+
+- **componentRegister** - Executed when the component is registered. Receives the component name as an argument.
+- **init** - Executed when the plugin is registered. Can be used for plugin initialization.
+- **componentRender** - Executed just before the content of the component is inserted into the DOM and can be used to manipulate that content. Receives the component itself as an argument.
+- **componentStartScan** - Executed when the component content is about to be scanned for other components. Receives the component itself as an argument.
+- **componentEndScan** - Executed when the component content is scanned for other components. Receives the component itself as an argument.
+- **componentCreate** - Executed when the component is created. May be used to extend the newly created object with properties and methods. Receives the component itself as an argument.
+- **scanNode** - Executed when the DOM scanner passes through every DOM node in search of component nodes. Receives the DOM node as an argument.
