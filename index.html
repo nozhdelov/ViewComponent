@@ -34,7 +34,7 @@
         <p><img src="http://s22.postimg.org/a05q2yt81/11990444_10206779686383918_8136752775770818219_n.jpg" alt=""></p>
 
 <h2>
-<a id="what-is-viewcomponent" class="anchor" href="#what-is-viewcomponent" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>What is ViewComponent</strong>
+<a id="what-is-viewcomponent" class="anchor" href="#what-is-viewcomponent" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>What is ViewComponent</strong>
 </h2>
 
 <hr>
@@ -160,6 +160,61 @@ component.appendTo(someDomNode);
     }.bind(this));
 
 });`
+</code></pre>
+
+<hr>
+
+<p><strong>Plugins</strong></p>
+
+<p>ViewComponent has a simple plugin system, which gives access to some of the internals of the library</p>
+
+<p>To create a plugen use the ViewComponent.registerPlugin method. It takes as arguments a name and a object that contains some callbacks;
+These callbacks will be executed at different stages of the life cycle of every component.
+Posible callbacks are : </p>
+
+<ul>
+<li>
+<strong>componentRegister</strong> - Executed when the component is registered. Receives the component name as an argument.</li>
+<li>
+<strong>init</strong> - Executed when the plugin is registered. Can be used for plugin initialization.</li>
+<li>
+<strong>componentRender</strong> - Executed just before the content of the component is inserted into the DOM and can be used to manipulate that content. Receives the component itself as an argument.</li>
+<li>
+<strong>componentStartScan</strong> - Executed when the component content is about to be scanned for other components. Receives the component itself as an argument.</li>
+<li>
+<strong>componentEndScan</strong> - Executed when the component content is scanned for other components. Receives the component itself as an argument.</li>
+<li>
+<strong>componentCreate</strong> - Executed when the component is created. May be used to extend the newly created object with properties and methods. Receives the component itself as an argument.</li>
+<li>
+<strong>scanNode</strong> - Executed when the DOM scanner passes through every DOM node in search of component nodes. Receives the DOM node as an argument.</li>
+</ul>
+
+<hr>
+
+<p><strong>Inheritance</strong></p>
+
+<p>Components can inherit properties methods and actions from one another.
+To make one component inherit another simply pass the ancestor constructor as a third argument of the register function </p>
+
+<pre><code>`var ancestor = ViewComponent.register('my-component', {
+
+init : function(conf){
+    this.firstName = conf.firstName;
+    this.familyName = conf.familyName;
+},
+
+fullName : function(){
+    return this.firstName + ' ' + this.familyName;
+}
+});
+
+var inherited = ViewComponent.register('my-inherited-component', {
+
+fullName : functon(){
+    return this.familyName + ', ' + this.firstName;
+    }
+
+}, ancestor);`
 </code></pre>
       </section>
     </div>
