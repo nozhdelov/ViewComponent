@@ -232,6 +232,19 @@ ViewComponent.prototype.findExecutable = function(name, params){
 			return self.actions[name].apply(self, args);
 		};
 	}
+	
+	
+	parent = this.ancestor;
+	while(parent){
+		if(parent.actions[name]){
+			return function(){
+				var args = Array.prototype.slice.call(arguments).concat(params);
+				return parent.actions[name].apply(parent, args);
+			};
+		}
+		parent = parent.ancestor;
+	}
+	
 	parent = this.getParent();
 	while(parent){
 		if(parent.actions[name]){

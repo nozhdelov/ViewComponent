@@ -129,3 +129,30 @@ Posible callbacks are :
 - **componentEndScan** - Executed when the component content is scanned for other components. Receives the component itself as an argument.
 - **componentCreate** - Executed when the component is created. May be used to extend the newly created object with properties and methods. Receives the component itself as an argument.
 - **scanNode** - Executed when the DOM scanner passes through every DOM node in search of component nodes. Receives the DOM node as an argument.
+
+
+----------
+**Inheritance**
+
+Components can inherit properties methods and actions from one another.
+To make one component inherit another simply pass the ancestor constructor as a third argument of the register function 
+
+    `var ancestor = ViewComponent.register('my-component', {
+
+	init : function(conf){
+	    this.firstName = conf.firstName;
+	    this.familyName = conf.familyName;
+	},
+
+	fullName : function(){
+	    return this.firstName + ' ' + this.familyName;
+	}
+    });
+
+    var inherited = ViewComponent.register('my-inherited-component', {
+    
+	fullName : functon(){
+	    return this.familyName + ', ' + this.firstName;
+        }
+    
+    }, ancestor);`
