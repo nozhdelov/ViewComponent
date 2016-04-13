@@ -1,3 +1,4 @@
+
 'use strict';
 
 
@@ -310,6 +311,17 @@ ViewComponent.prototype.callAction = function(actionName){
 };
 
 
+ViewComponent.prototype.callSuper = function(actionName){
+	var args = Array.prototype.slice.call(arguments);
+	args.shift();
+	
+	if(this.ancestor && typeof this.ancestor[actionName] === 'function'){
+		return this.ancestor[actionName].apply(this, args);
+	}
+};
+
+
+
 ViewComponent.prototype.find = function(selector){
 	return ViewComponent.find(selector, this);
 };
@@ -336,6 +348,15 @@ ViewComponent.extend = function(object, name, ancestor){
 		var i, actionInfo;
 		config = config || {};
 		
+		
+		if(ancestorInstance){
+			for(i in ancestorInstance){
+				if(ancestorInstance.hasOwnProperty(i)){
+					this[i] = ancestorInstance[i];
+				}
+			}
+		}
+		
 		this.ancestor = ancestorInstance;
 		this.parent = null;
 		this.children = [];
@@ -353,6 +374,9 @@ ViewComponent.extend = function(object, name, ancestor){
 		}
 		
 		ViewComponent.executePluginCallbacks('componentCreate', this);
+		
+		
+		
 		
 		for(i in object){
 			if(object.hasOwnProperty(i)){
@@ -383,7 +407,7 @@ ViewComponent.extend = function(object, name, ancestor){
 	
 	
 	
-	F.prototype = typeof ancestor === 'function' ? ancestorInstance : new ViewComponent();
+	F.prototype = typeof ancestor === 'function' ? ancestor.prototype : new ViewComponent();
 	ViewComponent.executePluginCallbacks('componentRegister', name);
 	return F;
 };
@@ -546,3 +570,5 @@ ViewComponent.executePluginCallbacks = function(type, obj){
 		}
 	}
 };
+
+
