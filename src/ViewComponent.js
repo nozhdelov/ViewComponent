@@ -62,7 +62,7 @@ ViewComponent.prototype.emit = function (type, data) {
 		for(i = 0; i < this.events[type].length; i++){
 			setTimeout((function(index){
 				return function(){
-					if(self.events[type][index]){
+					if(self.events[type] && self.events[type][index]){
 						self.events[type][index](data);
 					}
 				};
