@@ -1,4 +1,3 @@
-
 'use strict';
 
 
@@ -79,7 +78,7 @@ ViewComponent.prototype.init = function(){
 
 
 ViewComponent.prototype.render = function(){
-	return this.nodeContent;
+	return this.node.children;
 };
 
 
@@ -125,26 +124,28 @@ ViewComponent.prototype.prepare = function(tree){
 		}
 		div.innerHTML = '';
 		this.renderTree = fragment;
-	}  else if(!tree instanceof HTMLElement) {
+	} else if(this.renderTree instanceof HTMLCollection){
+		fragment = document.createDocumentFragment();
+		while(this.renderTree.length){
+			fragment.appendChild(this.renderTree[0]);
+		}
+		this.renderTree = fragment;
+		
+	} else if(!tree instanceof HTMLElement) {
 		throw new Error('Invalid DOM element');
 	}
 	
 	
 	
-	
-	/*
-	if(tree.nodeType === 11){		
-		this.renderTree = Array.prototype.slice.call(tree.childNodes, 0);
-	} else {
-		this.renderTree = [tree];
-	}*/
-	
-	
 	ViewComponent.executePluginCallbacks('componentStartScan', this);
+	
 	
 	ViewComponent.traverseTree(this.renderTree, function(node){
 		ViewComponent.scanNode(node, self);
 	});
+	
+	
+	
 	
 	ViewComponent.executePluginCallbacks('componentEndScan', this);
 	
@@ -479,8 +480,9 @@ ViewComponent.createComponent = function(componentName, config, parent, node, at
 
 	var component = new ViewComponent.registeredComponents[componentName.toUpperCase()](config, parent, node);
 	
-	node.innerHTML = '';
+	//node.innerHTML = '';
 	component.getRenderable().then(function(tree){
+		node.innerHTML = '';
 		node.appendChild(tree, node);
 		component.emit('render');
 	});
@@ -570,5 +572,3 @@ ViewComponent.executePluginCallbacks = function(type, obj){
 		}
 	}
 };
-
-
