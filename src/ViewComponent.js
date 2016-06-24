@@ -167,7 +167,7 @@ ViewComponent.prototype.appendTo = function(node){
 		var componentNode = document.createElement(self.componentName);
 		self.node = componentNode;
 		componentNode.appendChild(res);
-		self.node._component = this;
+		self.node._component = self;
 		node.appendChild(componentNode);
 		self.emit('render');
 	}).fail(function(res){
