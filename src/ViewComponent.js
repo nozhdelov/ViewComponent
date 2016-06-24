@@ -167,6 +167,7 @@ ViewComponent.prototype.appendTo = function(node){
 		var componentNode = document.createElement(self.componentName);
 		self.node = componentNode;
 		componentNode.appendChild(res);
+		self.node._component = this;
 		node.appendChild(componentNode);
 		self.emit('render');
 	}).fail(function(res){
@@ -186,7 +187,6 @@ ViewComponent.prototype.rerender = function(){
 		child.destroy();
 	});
 	this.children = [];
-	
 	this.getRenderable().then(function(tree){
 		if(self.node){
 			self.node.innerHTML = '';
@@ -479,7 +479,7 @@ ViewComponent.nodeHasAttribute = function(node, attribute){
 ViewComponent.createComponent = function(componentName, config, parent, node, attName){
 
 	var component = new ViewComponent.registeredComponents[componentName.toUpperCase()](config, parent, node);
-	
+	component.node._component = component;
 	//node.innerHTML = '';
 	component.getRenderable().then(function(tree){
 		node.innerHTML = '';
