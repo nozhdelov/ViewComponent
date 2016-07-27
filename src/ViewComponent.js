@@ -264,8 +264,12 @@ ViewComponent.prototype.findExecutable = function(name, params){
 
 
 ViewComponent.prototype.destroy = function(){
+	
 	this.on('destroy', function(){
 		this.off();
+		if(this.parent){
+			this.parent.removeChild(this);
+		}
 	}.bind(this));
 	this.emit('destroy');
 	this.children.forEach(function(child){
@@ -273,9 +277,7 @@ ViewComponent.prototype.destroy = function(){
 	});
 	
 //	this.removeFromDOM();
-	if(this.parent){
-		this.parent.removeChild(this);
-	}
+	
 	
 
 };
@@ -325,6 +327,17 @@ ViewComponent.prototype.callSuper = function(actionName){
 
 ViewComponent.prototype.find = function(selector){
 	return ViewComponent.find(selector, this);
+};
+
+ViewComponent.prototype.addAction = function(name, func){
+	this.actions[name] = func;
+	return this;
+};
+
+
+ViewComponent.prototype.removeAction = function(name){
+	delete this.actions[name];
+	return this;
 };
 
 
