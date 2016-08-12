@@ -78,7 +78,7 @@ ViewComponent.prototype.init = function(){
 
 
 ViewComponent.prototype.render = function(){
-	return this.node.children;
+	return this.nodeContent;
 };
 
 
@@ -493,7 +493,7 @@ ViewComponent.createComponent = function(componentName, config, parent, node, at
 
 	var component = new ViewComponent.registeredComponents[componentName.toUpperCase()](config, parent, node);
 	component.node._component = component;
-	//node.innerHTML = '';
+	node.innerHTML = '';
 	component.getRenderable().then(function(tree){
 		node.innerHTML = '';
 		node.appendChild(tree, node);
