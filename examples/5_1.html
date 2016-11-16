@@ -1,0 +1,63 @@
+<html>
+    
+    
+    
+    <head>
+
+        <script src="../src/q.js" ></script>
+        
+        <script src="../src/ViewComponent.js" ></script>
+	
+	
+	<script>
+	ViewComponent.register('com1', {
+		//render : () => 'com1'
+	});
+	
+	ViewComponent.register('com2', {
+		//render : () => 'com2'
+	});
+	
+	
+	ViewComponent.register('com3', {
+		render : function(){
+			var d = Q.defer();
+			
+			setTimeout(function(){
+				d.resolve('<com4></com4>');
+			}, 1000);
+			return d.promise;
+			
+		}	
+	
+	});
+	
+	ViewComponent.register('com4', {
+		render : () => 'com4'
+	});
+		
+	</script>
+
+        
+    </head>
+    
+    
+    
+    <body>
+    <com1>
+	    <com2>
+		    <com3></com3>
+	    </com2>
+	    
+    </com1>
+        
+        <script>
+      ViewComponent.scan(document.body);
+     </script>
+        
+        
+        
+    </body>
+    
+    
+</html>

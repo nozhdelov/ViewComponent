@@ -283,7 +283,7 @@ ViewComponent.prototype.destroy = function(){
 };
 
 ViewComponent.prototype.removeFromDOM = function(){
-	if(this.node.parentNode){
+	if(this.node && this.node.parentNode){
 		this.node.parentNode.removeChild(this.node);
 	}
 };
