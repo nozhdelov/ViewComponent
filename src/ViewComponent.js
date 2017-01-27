@@ -92,14 +92,10 @@ ViewComponent.prototype.getRenderable = function(){
 		tree.then(function(res){
 			deferred.resolve(self.prepare(res));
 		});
-	} else if(typeof tree === 'object' && tree.render){
-		for(i = 0; i < ViewComponent.registeredComponents.length; i++){
-			if(tree instanceof ViewComponent.registeredComponents[i]){
-				tree.getRenderable().then(function(res){
-					deferred.resolve(self.prepare(res));
-				});
-			}
-		}
+	} else if(typeof tree === 'object' && tree.render && tree.componentName){
+		tree.getRenderable().then(function(res){
+			deferred.resolve(self.prepare(res));
+		});
 		
 	} else {
 		deferred.resolve(self.prepare(tree));
