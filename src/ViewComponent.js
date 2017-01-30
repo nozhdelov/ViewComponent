@@ -93,9 +93,10 @@ ViewComponent.prototype.getRenderable = function(){
 			deferred.resolve(self.prepare(res));
 		});
 	} else if(typeof tree === 'object' && tree.render && tree.componentName){
-		tree.getRenderable().then(function(res){
-			deferred.resolve(self.prepare(res));
-		});
+		if(this.node){
+			tree.appendTo(this.node);
+			deferred.resolve(self.prepare(''));
+		}
 		
 	} else {
 		deferred.resolve(self.prepare(tree));
@@ -159,11 +160,11 @@ ViewComponent.prototype.appendTo = function(node){
 	}
 	
 	this.parentNode = node;
+	var componentNode = document.createElement(self.componentName);
+	this.node = componentNode;
+	this.node._component = this;
 	this.getRenderable().then(function(res){
-		var componentNode = document.createElement(self.componentName);
-		self.node = componentNode;
 		componentNode.appendChild(res);
-		self.node._component = self;
 		node.appendChild(componentNode);
 		self.emit('render');
 	}).fail(function(res){
