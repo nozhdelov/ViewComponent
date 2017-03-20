@@ -20,6 +20,12 @@ Properties
 - [actions](#propActions)
 
 
+State
+- [set](#stateSet)
+- [get](#stateGet)
+- [subscribe](#stateSubscribe)
+
+
 --
 
 Events
@@ -198,3 +204,11 @@ Emitted after the content is inserted in the DOM. At this stage the content can 
 
 ###<a name="eventDestroy"></a>destroy
 emitted when the "destroy" method is called or the component is destroyed for some other reason (For example the parent component is rerendering) 
+
+
+
+The State Object - every component has an internal .state object that can be used to share state between components in a given subtree
+The state object has 3 methods
+###<a name="stateGet"></a>.get(variableName) - returns the value of a shared variable variableName. variableName can also be a path in a object, for example 'object.subobject.varName'
+###<a name="stateSet"></a>.set(variableName, value) - sets a value for a shared variable variableName.
+###<a name="stateSubscribe"></a>.subscribe(variableName, handler) registers a callback for when a given shared variable is changed. The handler function receives the new value and the old value as arguments
