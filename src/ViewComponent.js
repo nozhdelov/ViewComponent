@@ -1,3 +1,4 @@
+
 'use strict';
 
 
@@ -97,7 +98,6 @@ ViewComponent.prototype.getRenderable = function(){
 			tree.appendTo(this.node);
 			deferred.resolve(self.prepare(''));
 		}
-		
 	} else {
 		deferred.resolve(self.prepare(tree));
 	}
@@ -179,7 +179,7 @@ ViewComponent.prototype.rerender = function(){
 	var oldThree = this.renderTree;
 	var oldChildren = this.children.slice();
 	var self = this;
-	
+
 	this.children.forEach(function(child){
 		child.destroy();
 	});
@@ -268,6 +268,7 @@ ViewComponent.prototype.destroy = function(){
 			this.parent.removeChild(this);
 		}
 	}.bind(this));
+	this.state.clearHandlers();
 	this.emit('destroy');
 	this.children.forEach(function(child){
 		child.destroy();
@@ -304,6 +305,16 @@ ViewComponent.prototype.parseActionAttribute = function(actionName, action){
 };
 
 
+ViewComponent.prototype.parseStateAttribute = function(actionName, action){
+	var executableInfo;
+	actionName = actionName.replace('state-', '');
+	executableInfo = this.parseActionAttribute(actionName, action);
+	
+	this.state.subscribe(actionName, executableInfo.executable);
+	return executableInfo;
+};
+
+
 ViewComponent.prototype.callAction = function(actionName){
 	var args = Array.prototype.slice.call(arguments);
 	args.shift();
@@ -326,6 +337,7 @@ ViewComponent.prototype.find = function(selector){
 	return ViewComponent.find(selector, this);
 };
 
+
 ViewComponent.prototype.addAction = function(name, func){
 	this.actions[name] = func;
 	return this;
@@ -335,6 +347,149 @@ ViewComponent.prototype.addAction = function(name, func){
 ViewComponent.prototype.removeAction = function(name){
 	delete this.actions[name];
 	return this;
+};
+
+
+
+
+
+
+// ***** ViewComponent.State *****
+
+ViewComponent.State = function(component){
+	this.state = {};
+	this.subscribers = {};
+	this.stateHandlers = {};
+	this.component = component;
+};
+
+ViewComponent.State.prototype.getStateRoot = function(){
+	var rootComponent = this.component;
+	while(rootComponent.parent){
+		rootComponent = rootComponent.parent;
+	}
+	return rootComponent.state;
+};
+
+ViewComponent.State.prototype.set = function(name, value){
+	var root, tmp, i, oldVal, nameParts;
+	name = name.toUpperCase();
+	nameParts = name.split('.');
+	root = this.getStateRoot();
+
+	tmp = root.state;
+	for(i = 0; i < nameParts.length; i++){
+		if(tmp[nameParts[i]] === undefined && i < nameParts.length - 1){
+			tmp[nameParts[i]] = {};
+		} 
+		
+		if(i < nameParts.length - 1){
+			tmp = tmp[nameParts[i]];
+		} else {
+			oldVal = tmp[nameParts[i]];
+			tmp[nameParts[i]] = value;
+		}
+	}
+	
+	root.publish(name, value, oldVal);
+};
+
+
+ViewComponent.State.prototype.get = function(name, defaultVal){
+	var root, tmp, i, nameParts;
+	root = this.getStateRoot();
+	
+	if(name === undefined){
+		return root.state;
+	}
+	name = name.toUpperCase();
+	
+	nameParts = name.split('.');
+	tmp = root.state;
+	for(i = 0; i < nameParts.length; i++){
+		if(tmp[nameParts[i]] === undefined && i < nameParts.length - 1){
+			return defaultVal;
+		} 
+		
+		if(i < nameParts.length - 1){
+			tmp = tmp[nameParts[i]];
+		} else {
+			return tmp[nameParts[i]];
+		}
+	}
+	
+	return defaultVal;
+};
+
+ViewComponent.State.prototype.subscribe = function(name, handler){
+	var root = this.getStateRoot();
+	name = name.toUpperCase();
+	if(typeof handler !== 'function'){
+		return false;
+	}
+	
+	if(root.subscribers[name] === undefined){
+		root.subscribers[name] = [];
+	}
+	
+	if(this.stateHandlers[name] === undefined){
+		this.stateHandlers[name] = [];
+	}
+	
+	
+	root.subscribers[name].push(this);
+	this.stateHandlers[name].push(handler);
+};
+
+
+
+ViewComponent.State.prototype.executeHandlers = function(name, newValue, oldValue){
+	var i, self = this;
+	if(this.stateHandlers[name] === undefined){
+		return false;
+	}
+	for(i = 0; i < this.stateHandlers[name].length; i++){
+		setTimeout((function(index){
+			return function(){
+				if(self.stateHandlers[name] && self.stateHandlers[name][index]){
+					self.stateHandlers[name][index](newValue, oldValue);
+				}
+			};
+		}(i)), 0);
+	}
+};
+
+
+ViewComponent.State.prototype.clearHandlers = function(){
+	this.stateHandlers = {};
+	this.getStateRoot().removeSubscriber(this);
+};
+
+ViewComponent.State.prototype.removeSubscriber = function(subscriber){
+	var index, i;
+	for(i in this.subscribers){
+		if(!this.subscribers.hasOwnProperty(i)){
+			continue;
+		}
+		index = this.subscribers[i].indexOf(subscriber);
+		if(index >= 0){
+			this.subscribers[i].splice(index, 1);
+		}
+	}
+	
+};
+
+ViewComponent.State.prototype.publish = function(name, newValue, oldValue){
+	var i, self = this;
+	var self = this;
+	
+	if(this.subscribers[name] === undefined){
+		return;
+	}
+
+	for(i = 0; i < this.subscribers[name].length; i++){
+		this.subscribers[name][i].executeHandlers(name, newValue, oldValue);
+	}
 };
 
 
@@ -368,6 +523,7 @@ ViewComponent.extend = function(object, name, ancestor){
 			}
 		}
 		
+		this.state = new ViewComponent.State(this);
 		this.ancestor = ancestorInstance;
 		this.parent = null;
 		this.children = [];
@@ -405,6 +561,9 @@ ViewComponent.extend = function(object, name, ancestor){
 			if(config.hasOwnProperty(i) && i.indexOf('action-') >= 0){
 				actionInfo = this.parseActionAttribute(i, config[i]);
 				config[actionInfo.name] = actionInfo.executable;
+			}
+			if(config.hasOwnProperty(i) && i.indexOf('state-') >= 0){
+				this.parseStateAttribute(i, config[i]);
 			}
 		}
 		
@@ -454,18 +613,20 @@ ViewComponent.scan = function(node){
 
 
 ViewComponent.scanNode = function(node, parent){
-	var attName, attValue, i, config = {};
+	var attName, attValue, i, config = {}, createFromAttribute = false;
 	
 	if(node.attributes !== undefined && node.attributes !== null){
 		for(i = 0; i < node.attributes.length; i++){
 			attValue = node.attributes[i].value;
 			attName = node.attributes[i].nodeName;
 			config[attName] = attValue;
-
 			if(ViewComponent.registeredComponents.hasOwnProperty(attName.toUpperCase())){
-				ViewComponent.createComponent(attName, config, parent, node);
+				createFromAttribute = attName;	
 			}
 			
+		}
+		if(createFromAttribute !== false){
+			ViewComponent.createComponent(createFromAttribute, config, parent, node);
 		}
 	}
 	
