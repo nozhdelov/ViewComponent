@@ -137,7 +137,7 @@ Posible callbacks are :
 Components can inherit properties methods and actions from one another.
 To make one component inherit another simply pass the ancestor constructor as a third argument of the register function 
 
-    `var ancestor = ViewComponent.register('my-component', {
+    var ancestor = ViewComponent.register('my-component', {
 
 	init : function(conf){
 	    this.firstName = conf.firstName;
@@ -155,4 +155,44 @@ To make one component inherit another simply pass the ancestor constructor as a 
 	    return this.familyName + ', ' + this.firstName;
         }
     
-    }, ancestor);`
+    }, ancestor);
+
+
+
+----------
+**Shared State**
+
+Components in a given subtree can share state through the state object. This eliminates the need to sync data between components and also can be used for communication instead of events.
+
+
+    `ViewComponent.register('my-component', {
+
+	init : function(conf){
+	    this.state.set('myVar', 47);
+	    this.state.subscribe('myVar', function(newValue, oldValue){
+		//react to state change
+		console.log(newValue, oldValue); //outputs 53, 47
+	    });
+	},
+
+	
+    });
+
+    ViewComponent.register('my-child-component', {
+    
+	init : function(){
+		this.state.set('myVar', 53);
+	}
+    
+    }, ancestor);
+
+	
+     //In the HTML
+	<my-component>
+		<my-child-component></my-child-component>
+	
+	</my-compnent>
+
+
+
+	`
