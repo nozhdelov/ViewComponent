@@ -511,13 +511,21 @@ ViewComponent.extend = function(object, name, ancestor){
 	var i;
 	var ancestorInstance = typeof ancestor === 'function' ? new ancestor(object) : null;
 	var F = function(config, parent, node){
-		var i, actionInfo;
+		var i, j, actionInfo;
 		config = config || {};
 		
-		
+		this.actions = {};
 		if(ancestorInstance){
 			for(i in ancestorInstance){
-				if(ancestorInstance.hasOwnProperty(i)){
+				if(!ancestorInstance.hasOwnProperty(i)){
+					continue;
+				}
+				if(i === 'actions' ){
+					for(j in ancestorInstance.actions){
+						this.actions[j] = ancestorInstance.actions[j];
+					}
+					
+				} else {
 					this[i] = ancestorInstance[i];
 				}
 			}
@@ -530,9 +538,14 @@ ViewComponent.extend = function(object, name, ancestor){
 		this.renderTree = null;
 		this.parentNode = null;
 		this.nodeContent = '';
-		this.actions = {};
+		
 		this.events = {};
 		this.componentName = name;
+		
+		if(typeof this.actions !== 'object'){
+			this.actions = {};
+		}
+		
 		
 		if(node){
 			this.nodeContent = node.innerHTML;
@@ -547,7 +560,15 @@ ViewComponent.extend = function(object, name, ancestor){
 		
 		for(i in object){
 			if(object.hasOwnProperty(i)){
-				this[i] = object[i];
+				if(i === 'actions' ){
+					for(j in object.actions){
+						this.actions[j] = object.actions[j];
+					}
+					
+				} else {
+					this[i] = object[i];
+				}
+				
 			}
 		}
 		
