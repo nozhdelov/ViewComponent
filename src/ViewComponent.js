@@ -96,6 +96,7 @@ ViewComponent.prototype.getRenderable = function(){
 	} else if(typeof tree === 'object' && tree.render && tree.componentName){
 		if(this.node){
 			tree.appendTo(this.node);
+			tree.parent = this;
 			deferred.resolve(self.prepare(''));
 		}
 	} else {
