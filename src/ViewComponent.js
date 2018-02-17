@@ -379,7 +379,7 @@ ViewComponent.State.prototype.set = function(name, value){
 	nameParts = name.split('.');
 	root = this.getStateRoot();
         
-        this.parseObjectValue(value);
+        value = this.parseObjectValue(value);
 
 	tmp = root.state;
 	for(i = 0; i < nameParts.length; i++){
@@ -401,11 +401,14 @@ ViewComponent.State.prototype.set = function(name, value){
 
 ViewComponent.State.prototype.parseObjectValue = function (val) {
     if (typeof val === 'object') {
+        let res = {};
         Object.keys(val).forEach(key => {
-            val[key.toUpperCase()] = val[key];
-            this.parseObjectValue(val[key.toUpperCase()]);
-            delete val[key];
+            res[key.toUpperCase()] =  this.parseObjectValue(val[key]);
         });
+	return res;
+        
+    } else {
+        return val;
     }
 };
 
